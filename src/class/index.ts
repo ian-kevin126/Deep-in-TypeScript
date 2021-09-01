@@ -15,3 +15,26 @@
  * 
  * 实例：new 出来的一个对象。 
  */
+
+class Person {
+
+  // public name: string | undefined; // TypeScript4.0之前属性如果没有赋值报错的解决办法，加一个undefined。
+
+  // 类上定义的属性一定是描绘这个类本身特征的变量，不建议把一些无关的变量定义放在类属性上
+  // 对象的变量/实例的 变量/类的【非静态属性】= 简称属性
+  public name: string = 'noname'
+  public age: number = 0
+  public phone: string = "11122223333"
+
+  constructor(_name: string, _age: number, _phone: string) {
+    this.name = _name;
+    this.age = _age;
+    this.phone = _phone
+  }
+
+  public doEat(who: string, how: string): string {
+    return `${this.name}, ${who}, ${how}`
+  }
+}
+
+const person = new Person('kevin', 12, '121313131');
