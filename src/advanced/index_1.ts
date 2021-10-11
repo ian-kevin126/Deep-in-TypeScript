@@ -95,7 +95,7 @@ class Animal {
 let a = new Animal("Tom");
 console.log(a.sayHi()); // My name is Tom
 
-// 类的继承：使用extends关键字来实现继承，子类中使用super关键字来调用父类的构造函数和方法
+// (1)，类的继承：使用extends关键字来实现继承，子类中使用super关键字来调用父类的构造函数和方法
 class Cat extends Animal {
   constructor(name: string) {
     super(name); // 调用父类的constructor(name)
@@ -110,7 +110,7 @@ class Cat extends Animal {
 const c = new Cat("Jerry");
 console.log(c.sayHi()); // My name is Jerry
 
-// 存取器：getter和setter，可以改变属性的赋值和读取行为
+// (2)，存取器：getter和setter，可以改变属性的赋值和读取行为
 class Animal2 {
   constructor(name) {
     this.name = name;
@@ -128,7 +128,7 @@ const a1 = new Animal2("Jeerrr");
 console.log(a1.name); // Jack
 a1.name = "Tommm"; // setter Tommm
 
-// 静态方法 static：修饰符修饰的方法称为静态方法，它们不需要实例化，而是直接通过类来调用
+// (3)，静态方法 static：修饰符修饰的方法称为静态方法，它们不需要实例化，而是直接通过类来调用
 class Animal3 {
   static isAnimal(a) {
     return a instanceof Animal3;
@@ -139,7 +139,7 @@ let a2 = new Animal3("JAck");
 console.log(Animal3.isAnimal(a2)); // true
 // console.log(a2.isAnimal(a2)); // Uncaught TypeError: a2.isAnimal is not a function
 
-// 静态属性 static
+// (4)，静态属性 static
 class Animal4 {
   static num = 42;
   constructor() {
@@ -226,3 +226,197 @@ class Son2 extends Person7 {
 
 const person8 = new Son2("kevin");
 console.log(person8.sayHi()); // Hi Kevin
+
+/**
+ * 5，类与接口
+ *
+ * 实现（implements）是面向对象中的一个重要概念，一般来讲，一个类只能继承自另一个类，有时候不同类之间可以有一些共有的特性，
+ * 这时候就可以把特性提取成接口（interfaces），用implements关键字来实现。这个特性大大提高了面向对象的灵活性。
+ */
+interface Alarm {
+  alert(): void;
+}
+
+class Door {}
+
+class SecurityDoor extends Door implements Alarm {
+  alert() {
+    console.log("SecurityDoor alert");
+  }
+}
+
+class Car implements Alarm {
+  alert() {
+    console.log("Car alert");
+  }
+}
+
+// 5-1，一个类可以实现多个接口
+interface Light {
+  lightOn(): void;
+  lightOff(): void;
+}
+
+class Car1 implements Alarm, Light {
+  alert() {
+    console.log("Car alert");
+  }
+
+  lightOn() {
+    console.log("Car light on");
+  }
+
+  lightOff() {
+    console.log("Car light off");
+  }
+}
+
+// 5-2，接口继承接口：接口之间可以是继承关系
+interface LightableAlarm extends Alarm {
+  lightOn(): void;
+  lightOff(): void;
+}
+
+// 5-3，接口继承类：常见的面向对象语言中，接口是不能继承类的，但是在TypeScript中却是可以的；
+class Point {
+  x: number;
+  y: number;
+  constructor(x: number, y: number) {
+    this.x = x;
+    this.y = y;
+  }
+}
+
+interface Point3d extends Point {
+  z: number;
+}
+
+const point3d: Point3d = { x: 1, y: 2, z: 3 };
+
+/**
+ * 6，泛型：是指在定义函数、接口或类的时候，不预先指定具体的类型，而在使用的时候再指定类型的一种特性;
+ */
+function createArray<T>(length: number, value: T): Array<T> {
+  let result: T[] = [];
+  for (let i = 0; i < length; i++) {
+    result[i] = value;
+  }
+  return result;
+}
+
+const arr3 = createArray(3, "x");
+console.log("arr", arr3); // ['x', 'x', 'x']
+const arr4 = createArray(3, 3);
+console.log("arr", arr4); // [3, 3, 3]
+
+// 6-1，多个类型参数：定义泛型时，可以一次性定义多个类型参数
+function swap<T, U>(tuple: [T, U]): [U, T] {
+  return [tuple[1], tuple[0]];
+}
+
+console.log(swap([7, "seven"])); // ['seven', 7]
+
+// 6-2，泛型约束
+function copyFields<T extends U, U>(target: T, source: U): T {
+  for (const id in source) {
+    target[id] = (<T>source)[id];
+  }
+  return target;
+}
+
+let x = { a: 1, b: 2, c: 3, d: 4 };
+console.log(copyFields(x, { b: 10, d: 20 })); // {a: 1, b: 10, c: 3, d: 20}
+
+// 6-3，泛型接口
+interface CreateArray {
+  <T>(length: number, value: T): Array<T>;
+}
+
+let createArrayFun: CreateArray;
+createArrayFun = function <T>(length: number, value: T): Array<T> {
+  let result: T[] = [];
+  for (let i = 0; i < length; i++) {
+    result[i] = value;
+  }
+  return result;
+};
+console.log(createArrayFun(4, 4)); // [4, 4, 4, 4]
+
+// 6-4，泛型类
+class GenericNumber<T> {
+  zeroValue: T;
+  add: (x: T, y: T) => T;
+}
+
+let myGenericNumber = new GenericNumber<number>();
+myGenericNumber.zeroValue = 0;
+myGenericNumber.add = function (x, y) {
+  return x + y;
+};
+
+// 6-5，泛型参数的默认类型
+function createArrayFunc2<T = string>(length: number, value: T): Array<T> {
+  let result: T[] = [];
+  for (let i = 0; i < length; i++) {
+    result[i] = value;
+  }
+  return result;
+}
+
+console.log(createArrayFunc2(4, 5)); // [5, 5, 5, 5]
+
+/**
+ * 7，声明合并
+ */
+// 7-1，函数的合并：我们可以使用重载定义多个函数类型
+function reverse(x: number): number;
+function reverse(x: string): string;
+function reverse(x: number | string): number | string {
+  if (typeof x === "number") {
+    return Number(x.toString().split("").reverse().join(""));
+  } else if (typeof x === "string") {
+    return x.split("").reverse().join("");
+  }
+}
+
+// 7-2，接口合并；接口中的属性在合并时会简单地合并到一个接口中
+interface Alarm1 {
+  price: number;
+}
+
+interface Alarm1 {
+  weight: number;
+}
+
+// 相当于
+interface Alarm {
+  price: number;
+  weight: number;
+}
+
+interface Alarm {
+  price: number;
+}
+interface Alarm {
+  price: number; // 虽然重复了，但是类型都是 `number`，所以不会报错
+  weight: number;
+}
+
+// 接口中方法的合并，与函数的合并一样
+interface Alarm {
+  price: number;
+  alert(s: string): string;
+}
+
+interface Alarm {
+  weight: number;
+  alert(s: string, n: number): string;
+}
+
+// 相当于
+interface Alarm {
+  price: number;
+  weight: number;
+  alert(s: string): string;
+  alert(s: string, n: number): string;
+}
