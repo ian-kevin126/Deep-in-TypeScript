@@ -117,3 +117,113 @@ let tom7: NewPerson3 = {
 /**
  * 二、数组的类型
  */
+// 1，定义一个数组变量
+let fibonacci: number[] = [1, 2, 3, 4, 5, 6];
+let fibonacci1: Array<number> = [1, 2, 3, 4, 55, 6];
+
+// 2，用接口表示数组，只要索引的类型是数字时，那么值的类型也必须是数字。
+interface NumberArray {
+  [index: number]: number;
+}
+let fibonacci2: NumberArray = [1, 2, 3, 4, 5];
+
+// 3，类数组：虽然接口也可以用来描述数组，但是我们一般不会这么做，因为这种方式比前两种方式复杂得多，不过有一种情况例外，那就是它常用来表示【类数组】。
+function sum() {
+  // let args: number[] = arguments;
+  // 上一句会报错：类型“IArguments”缺少类型“number[]”的以下属性: pop, push, concat, join 及其他 24 项。
+  // 因为arguments实际上是一个类数组，不能用普通的数组的方式来描述，而应该用接口。
+  let args: {
+    [index: number]: number;
+    length: number;
+    callee: Function;
+  } = arguments;
+}
+
+// 在这个例子中，我们除了约束当索引的类型是数字时，值的类型必须是数字之外，也约束了它还有length和callee两个属性
+// 事实上常用的类数组都有自己的接口定义，如IArguments，NodeList，HTMLCollection等；
+function sum1() {
+  let args: IArguments = arguments;
+}
+// IArguments是TypeScript中定义好的类型，它实际上就是：
+interface IArguments {
+  [index: number]: number;
+  length: number;
+  callee: Function;
+}
+
+// 4，any在数组中的应用
+let list: any[] = ["xcatliu", 25, { website: "http://xcatliu.com" }];
+
+/**
+ * 三、函数的类型
+ */
+// 1，函数定义
+function add(x: number, y: number): number {
+  return x + y;
+}
+// add(1, 2, 3); 传入多余的参数是不允许的。
+
+// 2，函数表达式
+// 不要混淆TypeScript中的箭头【=>】和ES6中的【=>】，TS中的左边是入参类型（用括号括起来），右边是输出类型。
+let myAdd: (x: number, y: number) => number = function (
+  x: number,
+  y: number
+): number {
+  return x + y;
+};
+
+// 3，用接口定义函数的形状
+interface SearchFunc {
+  (source: string, subString: string): boolean;
+}
+
+let mySearch: SearchFunc;
+mySearch = function (source: string, subString: string) {
+  return source.search(subString) !== -1;
+};
+
+// search() 方法执行正则表达式和 String 对象之间的一个搜索匹配。
+// 如果匹配成功，则 search() 返回正则表达式在字符串中首次匹配项的索引;否则，返回 -1。
+
+// const paragraph = 'The quick brown fox jumps over the lazy dog. If the dog barked, was it really lazy?';
+
+// any character that is not a word character or whitespace
+// const regex = /[^\w\s]/g;
+// console.log(paragraph.search(regex)); // expected output: 43
+// console.log(paragraph[paragraph.search(regex)]); // expected output: "."
+
+// 4，可选参数
+function buildName(firstName: string, lastName?: string) {
+  if (lastName) {
+    return firstName + "" + lastName;
+  } else {
+    return firstName;
+  }
+}
+
+let tomcat = buildName("Tom", "Cat");
+let tim = buildName("Tim");
+
+// 需要注意的是：可选参数必须放在必需参数后面。换句话说，可选参数后面不允许再出现必需参数。
+
+// 5，参数默认值
+function buildName1(lastName: string = "cat", firstName: string) {
+  return firstName + "" + lastName;
+}
+let tomcat1 = buildName("Tom", "Cat");
+let cat = buildName(undefined, "Cat");
+// 此时就不再受【可选参数必须接在必需参数后面】的限制了
+
+// 6，剩余（rest）参数
+// 事实上，items是一个数组，所以我们可以用数组的类型来定义它
+function push(array: any[], ...items: any[]) {
+  items.forEach((i) => array.push(i));
+}
+let aaa: any[] = [];
+push(aaa, 1, 2, 3);
+
+/**
+ * 7，函数重载
+ *
+ * 重载
+ */
