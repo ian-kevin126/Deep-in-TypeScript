@@ -225,5 +225,173 @@ push(aaa, 1, 2, 3);
 /**
  * 7，函数重载
  *
- * 重载
+ * 重载允许一个函数接收不同数量或类型的参数时，做出不同的处理。比如，我们需要实现一个函数reverse，输入数字123的时候，输出
+ * 反转的数字321，输入字符串hello的时候，输出反转的字符串olleh。
  */
+function reverseString(x: string | number): number | string | void {
+  if (typeof x === "number") {
+    return Number(x.toString().split("").reverse().join(""));
+  } else if (typeof x === "string") {
+    return x.split("").reverse().join("");
+  }
+}
+
+// 然而这样有一个缺点，就是不能精确地表达：输入为数字的时候，输出也为数字，输入为字符串的时候，输出也应该为字符串。
+// 这时候，我们可以使用重载定义多个reverse的函数类型：
+function reverseStringFunc(x: number): number; // 函数定义
+function reverseStringFunc(x: string): string; // 函数定义
+// 函数实现
+function reverseStringFunc(x: string | number): number | string | void {
+  if (typeof x === "number") {
+    return Number(x.toString().split("").reverse().join(""));
+  } else if (typeof x === "string") {
+    return x.split("").reverse().join("");
+  }
+}
+// 需要注意的是：TypeScript会优先从最前面的函数定义开始匹配，所以多个函数定义如果有包含关系，需要优先把精确的定义写在前面。
+
+/**
+ * 四，类型断言：可以手动指定一个值的类型。
+ *
+ * 语法：
+ * - 值 as 类型：在TSX语法（React的jsx语法的ts版）中必须使用这种。
+ * - <类型>值
+ *
+ * 形如<Foo>的语法在TSX中表示的是一个ReactNode，在ts中除了表示类型断言之外，也可能是表示一个泛型。建议使用 as 方式
+ */
+// 1，类型断言的用途：将一个联合类型断言为其中一个类型
+// 当TypeScript不确定一个联合类型的变量到底是哪个类型的时候，我们只能访问此联合类型的所有类型中共有的属性或方法
+interface Cat12 {
+  name: string;
+  run(): void;
+}
+
+interface Fish {
+  name: string;
+  swim(): void;
+}
+
+function getAnimalName(animal: Cat12 | Fish) {
+  return animal.name;
+}
+
+// 而有时候，我们确实需要在还不确定类型的时候就访问其中一个类型特有的属性或方法，比如：
+function isFish(animal: Cat12 | Fish) {
+  // 报错：类型“Cat | Fish”上不存在属性“swim”。类型“Cat”上不存在属性“swim”。
+  // if (typeof animal.swim === "function") {
+  //   return true;
+  // }
+
+  // 只需要加上类型断言就可以解决这个问题
+  if (typeof (animal as Fish).swim === "function") {
+    return true;
+  }
+
+  return false;
+}
+
+// 需要注意的是：类型断言只能【欺骗】TypeScript编辑器，无法避免运行时的错误，反而滥用类型断言可能会导致运行时错误。
+function swim(animal: Cat12 | Fish) {
+  (animal as Fish).swim();
+}
+
+const tom12: Cat12 = {
+  name: "Tom",
+  run() {
+    console.log("run");
+  },
+};
+
+swim(tom12); // 这个例子编译时不会报错，单在运行时会报错 —— Uncaught TypeError: animal.swim is not a function`
+// 原因是 (animal as Fish).swim(); 这段代码隐藏了animal可能为Cat的情况，将animal直接断言为Fish了。而TypeScript编译器
+// 信任了我们的断言，故而在调用swim()时没有编译报错。但是，一旦传入了Cat类型的参数，由于Cat上并没有swim方法，导致运行时
+// 错误。
+
+// 总之，适用类型断言时一定要格外小心，尽量避免断言后调用方法或引用深层属性，以减少不必要的运行时错误。
+
+// 2，将一个父类断言为更加具体的子类：当类之间有几成关系时，类型断言也是很常见的
+class ApiError extends Error {
+  code: number = 0;
+}
+
+class HttpError extends Error {
+  statusCode: number = 200;
+}
+
+function isApiError(error: Error) {
+  if (typeof (error as ApiError).code === "number") {
+    return true;
+  }
+  return false;
+}
+// 上面的例子中，我们声明了函数isApiError，它用来判断传入的参数是不是ApiError类型，为了实现这样一个函数，它的参数的类型
+// 肯定是比较抽象的父类Error，这样的话这个函数就能接受Error或它的子类作为参数了。但是由于父类Error中没有code属性，故直接
+// 获取error.code会报错，需要使用类型断言获取(error as ApiError).code。
+
+// 实际上，我们还有更好的方法来判断error的类型：instanceof，因为ApiError是一个JavaScript的类型，能够通过instanceof直接判断。
+function isApiError1(error: Error) {
+  if (error instanceof ApiError) {
+    return true;
+  }
+  return false;
+}
+
+// 但是有的情况下 ApiError 和 HttpError 不是一个真正的类，而只是一个 TypeScript 的接口（interface），接口是一个类型，
+// 不是一个真正的值，它在编译结果中会被删除，当然就无法使用 instanceof 来做运行时判断了：此时就只能用类型断言，通过判断是否
+// 存在 code 属性，来判断传入的参数是不是 ApiError 了：
+interface ApiError1 extends Error {
+  code: number;
+}
+
+interface HttpError extends Error {
+  statusCode: number;
+}
+
+function isApiError2(error: Error) {
+  if (typeof (error as ApiError1).code === "number") {
+    return true;
+  }
+  return false;
+}
+
+// 3，将任何一个类型断言为any：理想情况下，TypeScript的类型系统运转良好，每个值的类型都具体而精确，当我们引用一个在此类型上
+// 不存在的属性或方法的时候，就会报错
+const fooo: number = 1;
+// fooo.length = 1; // 类型“number”上不存在属性“length”。
+
+// 这种错误提示是非常有用的，但是有时候，我们非常确定这段代码不会报错，比如下面这个例子：
+// window.fooo = 1; // 类型“Window & typeof globalThis”上不存在属性“fooo”。
+// 但是，TypeScript编译时居然报错了，此时我们就可以使用as any临时将window断言为any类型：
+(window as any).foooo = 1;
+// 在any类型的变量上，访问任何属性都是允许的。需要注意的是，将一个变量断言为any可以说是解决TypeScript中类型问题的最后一个手段
+// 它极有可能掩盖了真正的类型错误，所以如果不是非常确定，就不要使用as any。
+
+// 上面的例子中，我们也可以通过【扩展window的类型（TODO）】解决这个错误，不过如果只是临时的增加foooo属性，as any会更加方便
+
+/**
+ * 总之，一方面不能滥用as any，另一方面也不要完全否定它的作用，我们需要在类型的严格性和开发的便利性之间掌握平衡（这也是TypeScript的设计
+ * 理念之一），才能发挥出TypeScript最大的价值。
+ * https://github.com/Microsoft/TypeScript/wiki/TypeScript-Design-Goals
+ */
+
+/**
+ * 4，将any断言为一个具体的类型
+ *
+ * 在日常的开发中，我们不可避免地需要处理any类型的变量，它们可能是由于第三方库未能定义好自己的类型，也有可能是历史遗留或其他人
+ * 编写的烂代码，还可能是受到TypeScript类型系统的限制而无法精确定义类型的场景。
+ *
+ * 遇到any类型的变量时，我们可以选择无视它，任由它滋生更多的any，我们也可以选择改进它，通过断言及时地把any断言为精确的类型，亡羊补牢
+ * 使我们的代码向着高可维护性的目标发展。举例来说，历史遗留的代码中有个getCacheData，它的返回值是any：
+ */
+function getCacheData(key: string): any {
+  return (window as any).cache[key];
+}
+// 那么我们在使用它时，最好能将调用了它之后的返回值断言成一个精确的类型，这样就方便了后续的操作。
+interface Cat23 {
+  name: string;
+  run(): void;
+}
+
+const tom23 = getCacheData("tom") as Cat23;
+tom23.run();
+// 上面的例子中，我们调用完getCacheData之后，立即将它断言为Cat23类型，这样的话就明确了tom23的类型，后续对tom23的访问就有了代码补全，提高了代码的可维护性。
