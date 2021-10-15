@@ -5,7 +5,7 @@ type NameResolver = () => string;
 type NameOrResolver = Name | NameResolver;
 
 function getName(n: NameOrResolver): Name {
-  if (typeof n === "string") {
+  if (typeof n === 'string') {
     return n;
   } else {
     return n();
@@ -13,13 +13,13 @@ function getName(n: NameOrResolver): Name {
 }
 
 // 2，字符串字面量类型：用来约束取值只能是某几个字符串中的一个
-type EventNames = "click" | "scroll" | "mousemove";
+type EventNames = 'click' | 'scroll' | 'mousemove';
 
 function handleEvent(ele: Element, event: EventNames) {
   // do something
 }
 
-handleEvent(document.getElementById("hello"), "scroll");
+handleEvent(document.getElementById('hello'), 'scroll');
 // handleEvent(document.getElementById("world"), 'dbclick'); // 类型“"dbclick"”的参数不能赋给类型“EventNames”的参数。
 
 // 3，枚举：用于取值被限定在一定范围内的场景，枚举成员会被赋值为从0开始递增的数字，同时也会对枚举值到枚举名进行反向映射；
@@ -30,19 +30,19 @@ enum Days {
   Wed,
   Thu,
   Fri,
-  Sat,
+  Sat
 }
 
-console.log(Days["Sun"] === 0); // true
-console.log(Days["Mon"] === 1); // true
-console.log(Days["Tue"] === 2); // true
-console.log(Days["Sat"] === 6); // true
+console.log(Days['Sun'] === 0); // true
+console.log(Days['Mon'] === 1); // true
+console.log(Days['Tue'] === 2); // true
+console.log(Days['Sat'] === 6); // true
 
 // 反向映射
-console.log(Days[0] === "Sun"); // true
-console.log(Days[1] === "Mon"); // true
-console.log(Days[2] === "Tue"); // true
-console.log(Days[6] === "Sat"); // true
+console.log(Days[0] === 'Sun'); // true
+console.log(Days[1] === 'Mon'); // true
+console.log(Days[2] === 'Tue'); // true
+console.log(Days[6] === 'Sat'); // true
 
 // 我们还可以给枚举手动赋值
 enum Days1 {
@@ -52,12 +52,12 @@ enum Days1 {
   Wed,
   Thu,
   Fri,
-  Sat,
+  Sat
 }
-console.log(Days1["Sun"] === 7); // true
-console.log(Days1["Mon"] === 1); // true
-console.log(Days1["Tue"] === 2); // true
-console.log(Days1["Sat"] === 6); // true
+console.log(Days1['Sun'] === 7); // true
+console.log(Days1['Mon'] === 1); // true
+console.log(Days1['Tue'] === 2); // true
+console.log(Days1['Sat'] === 6); // true
 
 /**
  * 4，类
@@ -92,7 +92,7 @@ class Animal {
   }
 }
 
-let a = new Animal("Tom");
+let a = new Animal('Tom');
 console.log(a.sayHi()); // My name is Tom
 
 // (1)，类的继承：使用extends关键字来实现继承，子类中使用super关键字来调用父类的构造函数和方法
@@ -107,36 +107,36 @@ class Cat extends Animal {
   }
 }
 
-const c = new Cat("Jerry");
+const c = new Cat('Jerry');
 console.log(c.sayHi()); // My name is Jerry
 
 // (2)，存取器：getter和setter，可以改变属性的赋值和读取行为
 class Animal2 {
-  constructor(name) {
+  constructor(name: any) {
     this.name = name;
   }
 
   get name() {
-    return "Jack";
+    return 'Jack';
   }
 
   set name(val) {
-    console.log("setter", val);
+    console.log('setter', val);
   }
 }
-const a1 = new Animal2("Jeerrr");
+const a1 = new Animal2('Jeerrr');
 console.log(a1.name); // Jack
-a1.name = "Tommm"; // setter Tommm
+a1.name = 'Tommm'; // setter Tommm
 
 // (3)，静态方法 static：修饰符修饰的方法称为静态方法，它们不需要实例化，而是直接通过类来调用
 class Animal3 {
-  static isAnimal(a) {
+  static isAnimal(a: any) {
     return a instanceof Animal3;
   }
 }
 
-let a2 = new Animal3("JAck");
-console.log(Animal3.isAnimal(a2)); // true
+// let a2 = new Animal3('JAck');
+console.log(Animal3.isAnimal(a1)); // true
 // console.log(a2.isAnimal(a2)); // Uncaught TypeError: a2.isAnimal is not a function
 
 // (4)，静态属性 static
@@ -162,7 +162,7 @@ class Person1 {
   }
 }
 
-const person1 = new Person1("kevin");
+const person1 = new Person1('kevin');
 // console.log(person1.name); // 属性“name”为私有属性，只能在类“Person1”中访问。
 // person1.name = "Tom"; // 属性“name”为私有属性，只能在类“Person1”中访问。
 
@@ -199,7 +199,7 @@ class Person4 {
     this.name = name;
   }
 }
-const person5 = new Person4("Jack");
+const person5 = new Person4('Jack');
 console.log(person5.name); // Jack
 // person5.name = "kevin"; // 无法分配到 "name" ，因为它是只读属性。
 
@@ -220,11 +220,11 @@ abstract class Person7 {
 
 class Son2 extends Person7 {
   public sayHi() {
-    return "Hi Kevin";
+    return 'Hi Kevin';
   }
 }
 
-const person8 = new Son2("kevin");
+const person8 = new Son2('kevin');
 console.log(person8.sayHi()); // Hi Kevin
 
 /**
@@ -239,17 +239,17 @@ interface Alarm {
 
 class Door {}
 
-class SecurityDoor extends Door implements Alarm {
-  alert() {
-    console.log("SecurityDoor alert");
-  }
-}
+// class SecurityDoor extends Door implements Alarm {
+//   alert() {
+//     console.log('SecurityDoor alert');
+//   }
+// }
 
-class Car implements Alarm {
-  alert() {
-    console.log("Car alert");
-  }
-}
+// class Car implements Alarm {
+//   alert() {
+//     console.log('Car alert');
+//   }
+// }
 
 // 5-1，一个类可以实现多个接口
 interface Light {
@@ -257,19 +257,19 @@ interface Light {
   lightOff(): void;
 }
 
-class Car1 implements Alarm, Light {
-  alert() {
-    console.log("Car alert");
-  }
+// class Car1 implements Alarm, Light {
+//   alert() {
+//     console.log('Car alert');
+//   }
 
-  lightOn() {
-    console.log("Car light on");
-  }
+//   lightOn() {
+//     console.log('Car light on');
+//   }
 
-  lightOff() {
-    console.log("Car light off");
-  }
-}
+//   lightOff() {
+//     console.log('Car light off');
+//   }
+// }
 
 // 5-2，接口继承接口：接口之间可以是继承关系
 interface LightableAlarm extends Alarm {
@@ -304,17 +304,17 @@ function createArray<T>(length: number, value: T): Array<T> {
   return result;
 }
 
-const arr3 = createArray(3, "x");
-console.log("arr", arr3); // ['x', 'x', 'x']
+const arr3 = createArray(3, 'x');
+console.log('arr', arr3); // ['x', 'x', 'x']
 const arr4 = createArray(3, 3);
-console.log("arr", arr4); // [3, 3, 3]
+console.log('arr', arr4); // [3, 3, 3]
 
 // 6-1，多个类型参数：定义泛型时，可以一次性定义多个类型参数
 function swap<T, U>(tuple: [T, U]): [U, T] {
   return [tuple[1], tuple[0]];
 }
 
-console.log(swap([7, "seven"])); // ['seven', 7]
+console.log(swap([7, 'seven'])); // ['seven', 7]
 
 // 6-2，泛型约束
 function copyFields<T extends U, U>(target: T, source: U): T {
@@ -372,11 +372,12 @@ console.log(createArrayFunc2(4, 5)); // [5, 5, 5, 5]
 function reverse(x: number): number;
 function reverse(x: string): string;
 function reverse(x: number | string): number | string {
-  if (typeof x === "number") {
-    return Number(x.toString().split("").reverse().join(""));
-  } else if (typeof x === "string") {
-    return x.split("").reverse().join("");
+  if (typeof x === 'number') {
+    return Number(x.toString().split('').reverse().join(''));
+  } else if (typeof x === 'string') {
+    return x.split('').reverse().join('');
   }
+  return '';
 }
 
 // 7-2，接口合并；接口中的属性在合并时会简单地合并到一个接口中
