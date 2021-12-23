@@ -69,7 +69,7 @@ import 'reflect-metadata';
 
 import './basics/basics';
 
-export {};
+export { };
 
 // function get(path: string) {
 //   return (classProperty: any, methodName: string, desc: PropertyDescriptor) => {
