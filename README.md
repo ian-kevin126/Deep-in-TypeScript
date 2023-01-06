@@ -33,6 +33,8 @@ npm install parcel-bundler -D
 }
 ```
 
+启动项目：yarn dev
+
 # 装饰器章节下的修改
 
 ## concurrently

@@ -48,7 +48,8 @@ require("reflect-metadata");
 // import './装饰器/装饰器执行的顺序/1';
 // import './装饰器/metadata/defineMetadata';
 // import './装饰器/依赖注入/index';
-require("./Promise/index");
+// import './basics/basics';
+require("./deep-in-ts/chap-03/07-ts\u7EE7\u627F");
 // function get(path: string) {
 //   return (classProperty: any, methodName: string, desc: PropertyDescriptor) => {
 //     console.log(classProperty, methodName, desc);

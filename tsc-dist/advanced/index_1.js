@@ -275,16 +275,103 @@ function getCacheData(key) {
 }
 var tom23 = getCacheData('tom');
 tom23.run();
-// 上面的例子中，我们调用完getCacheData之后，立即将它断言为Cat23类型，这样的话就明确了tom23的类型，后续对tom23的访问就有了代码补全，提高了代码的可维护性。
+var tom_1 = {
+    name: 'tom',
+    run: function () {
+        console.log('run');
+    }
+};
+var animal = tom_1;
+function testAnimal(animal) {
+    return animal;
+}
+function testCat(cat) {
+    return cat;
+}
+function testCat1(cat) {
+    return cat;
+}
 /**
- * 5，类型断言的限制
+ * 在上面的例子中，若直接使用 cat as Fish 肯定会报错，因为Cat和Fish互相不兼容。但是若使用双重断言，则可以打破【要使得A能够被断言为B，只需要A兼容B或者B
+ * 兼容A即可】的限制，将任何一个类型断言为任何另一个类似。
  *
- * 从上面的例子中，我们可以总结出：
- * - 联合类型可以被断言为其中一个类型
- * - 父类可以被断言为子类
- * - 任何类型都可以被断言为any
- * - any也可以被断言成任何类型
+ * 若你使用了这种双重断言，那么十有八九是非常错误的，他很可能会导致运行时错误。
  *
- * 那么类型断言是不是没有什么限制呢？是不是任何一个类型都可以被断言成任何另一个类型呢？
- * 答案是否定的，并不是任何一个类型都可以被断言成任何另一个类型。具体来说，若A兼容B，
+ * 【除非迫不得已，千万别用双重断言】
  */
+/**
+ * 7，类型断言 VS 类型转换
+ *
+ * 类型断言只会影响TypeScript编译时的类型，类型断言语句在编译结果中会被删除。
+ */
+function toBoolean1(something) {
+    return something;
+}
+toBoolean1(1); // 返回值为 1
+// 在上面的例子中，将 something 断言为 boolean 虽然可以通过编译，但是并没有什么用，代码在编译后会变成：
+function toBoolean2(something) {
+    return something;
+}
+toBoolean2(1); // 返回值为 1
+// 所以类型断言不是类型转换，它不会真的影响到变量的类型。
+// 若要进行类型转换，需要直接调用类型转换的方法：
+function toBoolean3(something) {
+    return Boolean(something);
+}
+toBoolean3(1); // 返回值为 true
+/**
+ * 8，类型断言 VS 类型声明
+ *
+ */
+function getCacheData1(key) {
+    return window.cache[key];
+}
+var tom1 = getCacheData('tom');
+tom1.run();
+// 我们使用 as Cat将any类型断言为了Cat类型，但实际上还有其他方法可以解决这个问题：
+function getCacheData2(key) {
+    return window.cache[key];
+}
+var tom2 = getCacheData('tom');
+tom2.run();
+var anim = {
+    name: 'tom'
+};
+var tom3 = anim;
+var animal32 = {
+    name: 'tom'
+};
+// let tom65: Cat = animal32;
+// index.ts:12:5 - error TS2741: Property 'run' is missing in type 'Animal' but required in type 'Cat'.
+// 则会报错，不允许将 animal 赋值为 Cat 类型的 tom。
+// 这很容易理解，Animal 可以看作是 Cat 的父类，当然不能将父类的实例赋值给类型为子类的变量。
+/**
+ * 深入地讲，它们的核心区别就在于：
+ * - animal 断言为 Cat，只需要满足 Animal 兼容 Cat 或 Cat 兼容 Animal 即可
+ * - animal 赋值给 tom，需要满足 Cat 兼容 Animal 才行
+ *
+ * 但是 Cat 并不兼容 Animal。
+ *
+ * 而在前一个例子中，由于 getCacheData('tom') 是 any 类型，any 兼容 Cat，Cat 也兼容 any，故：
+ * const tom = getCacheData('tom') as Cat;
+ * 等价于：
+ * const tom: Cat = getCacheData('tom');
+ *
+ * 知道了它们的核心区别，就知道了类型声明是比类型断言更加严格的。所以为了增加代码的质量，我们最好优先使用类型声明，这也比类型断言的 as 语法更加优雅。
+ */
+/**
+ * 9，类型断言 VS 泛型
+ * 前置知识：https://ts.xcatliu.com/advanced/generics.html
+ */
+function getCacheData5(key) {
+    return window.cache[key];
+}
+var tom322 = getCacheData5('tom');
+tom322.run();
+//  我们还有第三种方式可以解决这个问题，那就是泛型：
+function getCacheData6(key) {
+    return window.cache[key];
+}
+var tom344 = getCacheData6('tom');
+tom344.run();
+//  通过给 getCacheData 函数添加了一个泛型 <T>，我们可以更加规范的实现对 getCacheData 返回值的约束，这也同时去除掉了代码中的 any，是最优的一个解决方案。

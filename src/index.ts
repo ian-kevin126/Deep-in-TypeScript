@@ -67,9 +67,13 @@ import 'reflect-metadata';
 
 // import './装饰器/依赖注入/index';
 
-import './basics/basics';
+// import './basics/basics';
 
-export { };
+import './deep-in-ts/chap-04/12-typeof局限性';
+
+// 这个语句的作用就是，可以避免在不同的文件中声明相同的变量时导致的同名报错。这一句就是告诉ts引擎只在本文件中搜索。
+// 不写export，就会变成全局的变量。
+export {};
 
 // function get(path: string) {
 //   return (classProperty: any, methodName: string, desc: PropertyDescriptor) => {
