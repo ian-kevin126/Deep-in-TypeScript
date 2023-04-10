@@ -55,7 +55,7 @@ concurrently 用来同时执行多条 npm 命令 `npm install concurrently -S`
 
 ## package.json 修改
 
-```json5
+```js
 {
   scripts: {
     service: 'parcel ./index.html',
